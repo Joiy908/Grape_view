@@ -26,7 +26,12 @@
       </el-aside>
       <!-- 主体内容 -->
       <el-main class="main-content">
-        <RouterView />
+        <router-view v-slot="{ Component }">
+          <keep-alive>
+            <component :is="Component" v-if="$route.meta.keepAlive" :key="$route.name" />
+          </keep-alive>
+          <component :is="Component" v-if="!$route.meta.keepAlive" :key="$route.name" />
+        </router-view>
       </el-main>
     </el-container>
   </el-container>
