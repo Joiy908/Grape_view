@@ -1,11 +1,19 @@
 <template>
-  <div :class="messageClass">
-    <div :class="avatarClass">
-      <i :class="avatarIconClass"></i>
+  <div :class="messageWrapperClass">
+    <!-- Agent/toolcallResult 消息 -->
+    <div class="messageContent" v-if="isAgentOrTool">
+      <!-- toolcallResult：用 el-collapse 展示 call + markdown -->
+      <el-collapse v-if="isToolcallResult" accordion>
+        <el-collapse-item :title="toolResponse?.call || 'Tool Result'" name="1">
+          <div v-html="renderedContent"></div>
+        </el-collapse-item>
+      </el-collapse>
+
+      <!-- agent 消息：直接渲染 markdown -->
+      <div v-else v-html="renderedContent"></div>
     </div>
-    <!-- 用 v-html 渲染 agent 消息 -->
-    <div class="messageContent" v-if="isAgent" v-html="renderedContent"></div>
-    <!-- 用户消息仍使用纯文本 -->
+
+    <!-- 用户消息 -->
     <div class="messageContent" v-else>
       {{ props.message.content }}
     </div>
@@ -15,86 +23,78 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import MarkdownIt from 'markdown-it'
-
-interface Message {
-  role: 'user' | 'agent'
-  content: string
-}
+import type { Message, ToolResponse } from '../types'
 
 const props = defineProps<{ message: Message }>()
-const md = new MarkdownIt()
+const md = new MarkdownIt({ breaks: true })
 
-const isAgent = computed(() => props.message.role === 'agent')
-
-const messageClass = computed(() =>
-  isAgent.value ? 'message agentMessage' : 'message userMessage',
+const isUser = computed(() => props.message.role === 'user')
+const isToolcallResult = computed(() => props.message.role === 'toolcallResult')
+const isAgentOrTool = computed(
+  () => props.message.role === 'agent' || props.message.role === 'toolcallResult',
 )
+const toolResponse = computed(() => {
+  if (isToolcallResult.value) {
+    return JSON.parse(props.message.content) as ToolResponse
+  }
+  return null
+})
 
-const avatarClass = computed(() => (isAgent.value ? 'avatar agentAvatar' : 'avatar userAvatar'))
-
-const avatarIconClass = computed(() => (isAgent.value ? 'pi pi-desktop' : 'pi pi-user'))
-
-// 渲染 agent 消息 markdown
+// 渲染 agent/toolcallResult 消息 markdown
 const renderedContent = computed(() => {
+  if (props.message.role === 'toolcallResult') {
+    if (toolResponse.value.success) {
+      return md.render(toolResponse.value.data)
+    } else {
+      return md.render(toolResponse.value.message)
+    }
+  }
   return md.render(props.message.content)
+})
+
+// 外层 message class，决定消息方向
+const messageWrapperClass = computed(() => {
+  return isUser.value ? 'message message-right' : 'message message-left'
 })
 </script>
 
 <style scoped>
 .message {
   display: flex;
-  align-items: flex-start;
   margin: 10px 0;
+  max-width: 100%;
+}
+
+.message-right {
+  justify-content: flex-end;
+}
+
+.message-left {
+  justify-content: flex-start;
 }
 
 .messageContent {
   max-width: 80%;
-  background-color: white;
   padding: 10px 15px;
   border-radius: 10px;
   word-wrap: break-word;
+  background-color: #f5f5f5;
 }
 
-/* 用户样式 */
-.userMessage .messageContent {
-  background-color: #e0f7fa;
-}
-.userAvatar {
-  background-color: #00acc1;
-}
-
-/* Agent 样式 */
-.agentMessage .messageContent {
-  background-color: #e8eaf6;
-}
-.agentAvatar {
-  background-color: #3949ab;
-}
-
-/* Avatar icons */
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 20px;
+/* 用户消息样式 */
+.message-right .messageContent {
+  background-color: #d1ecf1;
+  text-align: right;
   margin-right: 10px;
 }
 
-.pi {
-  font-style: normal;
-}
-.pi-user::before {
-  content: '👤';
-}
-.pi-desktop::before {
-  content: '💻';
+/* Agent/toolcallResult 消息样式 */
+.message-left .messageContent {
+  background-color: #e8eaf6;
+  text-align: left;
 }
 
-/* 可选：Markdown 样式增强 */
+/* Markdown 样式增强 */
 .messageContent h1,
 .messageContent h2 {
   margin: 0.5em 0;

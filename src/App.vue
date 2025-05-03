@@ -1,8 +1,8 @@
 <template>
-  <el-container>
+  <el-container style="height: 100vh">
     <!-- 顶部导航栏 -->
     <el-header class="fixed-header">
-      <h1>我的主页</h1>
+      <h2>葡萄生产数字化系统</h2>
     </el-header>
     <el-container>
       <!-- 侧边栏 -->
@@ -25,7 +25,7 @@
         </el-menu>
       </el-aside>
       <!-- 主体内容 -->
-      <el-main class="scroll-main">
+      <el-main class="main-content">
         <RouterView />
       </el-main>
     </el-container>
@@ -48,41 +48,22 @@ const handleSelect = (index) => {
 }
 </script>
 
-<style>
-/* 固定 header */
+<style scope>
 .fixed-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50px; /* el-header 默认高度 */
   background-color: #409eff;
   color: white;
-  z-index: 1000;
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  height: 40px;
 }
-
-/* 固定侧边栏 */
 .fixed-aside {
-  position: fixed;
-  top: 50px; /* header 高度 */
-  left: 0;
-  bottom: 0;
-  width: 150px;
   background-color: #f2f2f2;
+  width: 80px;
   overflow: auto;
 }
-
-/* 主体内容，左边预留 aside 宽度，顶部预留 header 高度 */
-.scroll-main {
-  margin-top: 50px;
-  margin-left: 150px;
-  padding: 0;
-  /* height: calc(100vh - 0px); */
+.main-content {
+  padding: 0 20px;
+  height: calc(100vh - 40px);
   overflow: auto;
-  background-color: #fff;
-  box-sizing: border-box;
 }
 </style>
