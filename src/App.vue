@@ -1,13 +1,12 @@
 <template>
   <el-container>
     <!-- 顶部导航栏 -->
-    <!-- <el-header style="background-color: #409eff; color: white; display: flex; align-items: center">
-      <h1 style="margin: 0; font-size: 20px">我的主页</h1>
-    </el-header> -->
-
+    <el-header class="fixed-header">
+      <h1>我的主页</h1>
+    </el-header>
     <el-container>
       <!-- 侧边栏 -->
-      <el-aside width="100px" style="background-color: #f5f5f5">
+      <el-aside class="fixed-aside">
         <el-menu
           :default-active="activeMenu"
           class="el-menu-vertical-demo"
@@ -25,9 +24,8 @@
           </el-menu-item>
         </el-menu>
       </el-aside>
-
       <!-- 主体内容 -->
-      <el-main>
+      <el-main class="scroll-main">
         <RouterView />
       </el-main>
     </el-container>
@@ -49,3 +47,42 @@ const handleSelect = (index) => {
   activeMenu.value = index
 }
 </script>
+
+<style>
+/* 固定 header */
+.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px; /* el-header 默认高度 */
+  background-color: #409eff;
+  color: white;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+/* 固定侧边栏 */
+.fixed-aside {
+  position: fixed;
+  top: 50px; /* header 高度 */
+  left: 0;
+  bottom: 0;
+  width: 150px;
+  background-color: #f2f2f2;
+  overflow: auto;
+}
+
+/* 主体内容，左边预留 aside 宽度，顶部预留 header 高度 */
+.scroll-main {
+  margin-top: 50px;
+  margin-left: 150px;
+  padding: 0;
+  /* height: calc(100vh - 0px); */
+  overflow: auto;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+</style>
