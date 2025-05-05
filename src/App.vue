@@ -16,8 +16,8 @@
           <el-menu-item index="/">
             <span>首页</span>
           </el-menu-item>
-          <el-menu-item index="/about">
-            <span>关于</span>
+          <el-menu-item index="/dashboards">
+            <span>环境数据</span>
           </el-menu-item>
           <el-menu-item index="/contact">
             <span>联系</span>
@@ -28,9 +28,8 @@
       <el-main class="main-content">
         <router-view v-slot="{ Component }">
           <keep-alive>
-            <component :is="Component" v-if="$route.meta.keepAlive" :key="$route.name" />
+            <component :is="Component" />
           </keep-alive>
-          <component :is="Component" v-if="!$route.meta.keepAlive" :key="$route.name" />
         </router-view>
       </el-main>
     </el-container>
@@ -63,7 +62,7 @@ const handleSelect = (index) => {
 }
 .fixed-aside {
   background-color: #f2f2f2;
-  width: 80px;
+  width: 100px;
   overflow: auto;
 }
 .main-content {

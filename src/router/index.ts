@@ -12,6 +12,12 @@ const router = createRouter({
       meta: { keepAlive: true },
     },
     {
+      path: '/dashboards',
+      name: 'dashboards',
+      component: import('../views/DashboardsView.vue'),
+      meta: { keepAlive: true },
+    },
+    {
       path: '/about',
       name: 'about',
       // route level code-splitting
