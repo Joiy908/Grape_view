@@ -97,26 +97,6 @@ function scrollToBottom() {
     }
   })
 }
-const inputAreaRef = ref<HTMLElement | null>(null)
-const scrollbarHeight = ref(0)
-
-function calcHeights() {
-  nextTick(() => {
-    const inputHeight = inputAreaRef.value?.offsetHeight || 0
-    const totalHeight = window.innerHeight
-    scrollbarHeight.value = totalHeight - inputHeight - 40
-  })
-}
-
-// 初始化和窗口大小变化时重新计算
-onMounted(() => {
-  calcHeights()
-  window.addEventListener('resize', calcHeights)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', calcHeights)
-})
 </script>
 
 <template>
@@ -125,8 +105,12 @@ onBeforeUnmount(() => {
       Your ID: <span>{{ clientId }}</span>
     </h3> -->
 
-    <el-scrollbar :height="scrollbarHeight + 'px'" ref="scrollbarRef">
-      <ChatMessage v-for="(message, index) in messages" :key="index" :message="message" />
+    <el-scrollbar ref="scrollbarRef">
+      <template v-for="(message, index) in messages" :key="index">
+        <ChatMessage :message="message" />
+        <!-- 👇 Spacer，仅在最后一条消息后插入 -->
+        <div v-if="index === messages.length - 1" class="message-spacer" />
+      </template>
     </el-scrollbar>
 
     <form ref="inputAreaRef" @submit.prevent="sendMessage" class="input-area">
@@ -143,6 +127,9 @@ onBeforeUnmount(() => {
   flex-direction: column;
   height: 100%;
 }
+.message-spacer {
+  height: 80px; /* 根据你希望的底部留白高度调整 */
+}
 
 .input-area {
   /* height: 50px; */
@@ -151,7 +138,7 @@ onBeforeUnmount(() => {
   left: 0;
   right: 0;
 
-  margin: 0 10vw 20px 15vw;
+  margin: 0 10vw 15px 15vw;
 
   background: white;
   padding: 10px;
