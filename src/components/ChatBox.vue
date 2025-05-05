@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import ChatMessage from './ChatMessage.vue'
 import type { Message } from '../types'
+import type { ScrollbarInstance } from 'element-plus'
 
+const scrollbarRef = ref<ScrollbarInstance>()
 const clientId = Date.now()
 const ws = ref<WebSocket | null>(null)
 const inputText = ref('')
@@ -37,7 +39,6 @@ const messages = ref<Message[]>([
   { role: 'toolcallResult', content: JSON.stringify(temp_json) },
   { role: 'agent', content: ass1 },
 ])
-const chatBox = ref<HTMLDivElement | null>(null)
 
 onMounted(() => {
   ws.value = new WebSocket(`ws://localhost:8000/ws/${clientId}`)
@@ -73,6 +74,7 @@ onMounted(() => {
       scrollToBottom()
     }
   }
+  scrollToBottom()
 })
 
 function sendMessage() {
@@ -89,11 +91,32 @@ function sendMessage() {
 
 function scrollToBottom() {
   nextTick(() => {
-    if (chatBox.value) {
-      chatBox.value.scrollTop = chatBox.value.scrollHeight
+    const el = scrollbarRef.value
+    if (el) {
+      el.setScrollTop(el.wrapRef.scrollHeight)
     }
   })
 }
+const inputAreaRef = ref<HTMLElement | null>(null)
+const scrollbarHeight = ref(0)
+
+function calcHeights() {
+  nextTick(() => {
+    const inputHeight = inputAreaRef.value?.offsetHeight || 0
+    const totalHeight = window.innerHeight
+    scrollbarHeight.value = totalHeight - inputHeight - 40
+  })
+}
+
+// 初始化和窗口大小变化时重新计算
+onMounted(() => {
+  calcHeights()
+  window.addEventListener('resize', calcHeights)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', calcHeights)
+})
 </script>
 
 <template>
@@ -101,11 +124,12 @@ function scrollToBottom() {
     <!-- <h3>
       Your ID: <span>{{ clientId }}</span>
     </h3> -->
-    <div id="chatArea" ref="chatBox" class="chat-box">
-      <ChatMessage v-for="(message, index) in messages" :key="index" :message="message" />
-    </div>
 
-    <form @submit.prevent="sendMessage" class="input-area">
+    <el-scrollbar :height="scrollbarHeight + 'px'" ref="scrollbarRef">
+      <ChatMessage v-for="(message, index) in messages" :key="index" :message="message" />
+    </el-scrollbar>
+
+    <form ref="inputAreaRef" @submit.prevent="sendMessage" class="input-area">
       <input v-model="inputText" type="text" placeholder="Type a message..." autocomplete="off" />
       <button type="submit">Send</button>
     </form>
@@ -120,15 +144,6 @@ function scrollToBottom() {
   height: 100%;
 }
 
-.chat-box {
-  border: 1px solid #ccc;
-  height: calc(100vh - 40px - 70px); /* 留出底部输入区域的高度 */
-  overflow: auto;
-
-  background: #f9f9f9;
-  margin-bottom: 10px;
-}
-
 .input-area {
   /* height: 50px; */
   position: fixed;
@@ -136,7 +151,7 @@ function scrollToBottom() {
   left: 0;
   right: 0;
 
-  margin: 0 10dvw 20px 150px;
+  margin: 0 10vw 20px 15vw;
 
   background: white;
   padding: 10px;
