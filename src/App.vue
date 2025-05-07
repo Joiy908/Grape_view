@@ -19,8 +19,14 @@
           <el-menu-item index="/dashboards">
             <span>环境数据</span>
           </el-menu-item>
-          <el-menu-item index="/contact">
-            <span>联系</span>
+          <el-menu-item index="/irrigation">
+            <span>灌溉管理</span>
+          </el-menu-item>
+          <el-menu-item index="/events">
+            <span>农事管理</span>
+          </el-menu-item>
+          <el-menu-item index="/knowledge">
+            <span>葡萄知识</span>
           </el-menu-item>
         </el-menu>
       </el-aside>
