@@ -4,7 +4,7 @@
     <div class="messageContent" v-if="isAgentOrTool">
       <!-- toolcallResult：用 el-collapse 展示 call + markdown -->
       <el-collapse v-if="isToolcallResult" accordion>
-        <el-collapse-item :title="toolResponse?.call || 'Tool Result'" name="1">
+        <el-collapse-item :title="truncatedCall" name="1">
           <div v-html="renderedContent"></div>
         </el-collapse-item>
       </el-collapse>
@@ -39,12 +39,21 @@ const toolResponse = computed(() => {
   }
   return null
 })
+// 截断 toolResponse.call，如果过长
+const truncatedCall = computed(() => {
+  const maxLength = 50
+  const callText = toolResponse.value?.call || 'Tool Result'
+  return callText.length > maxLength ? callText.substring(0, maxLength) + '...' : callText
+})
 
 // 渲染 agent/toolcallResult 消息 markdown
 const renderedContent = computed(() => {
   if (props.message.role === 'toolcallResult') {
+    // console.log(toolResponse.value, toolResponse.value.data)
     if (toolResponse.value.success) {
-      return md.render(toolResponse.value.data)
+      if (toolResponse.value.format === 'json')
+        return md.render(JSON.stringify(toolResponse.value.data))
+      else return md.render(toolResponse.value.data)
     } else {
       return md.render(toolResponse.value.message)
     }
@@ -56,6 +65,7 @@ const renderedContent = computed(() => {
 const messageWrapperClass = computed(() => {
   return isUser.value ? 'message message-right' : 'message message-left'
 })
+console.log(props.message)
 </script>
 
 <style scoped>
