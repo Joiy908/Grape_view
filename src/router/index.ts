@@ -5,6 +5,7 @@ import IrrigationView from '@/views/irrigationView.vue'
 import EventsView from '@/views/EventsView.vue'
 import Usersview from '@/views/UsersView.vue'
 import LoginView from '@/views/LoginView.vue'
+import RootView from '@/views/RootView.vue'
 import { useUserStore } from '../stores/users'
 
 const router = createRouter({
@@ -12,6 +13,12 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      name: 'root',
+      component: RootView,
+      meta: { keepAlive: true, requiresAuth: true },
+    },
+    {
+      path: '/chat',
       name: 'chat',
       component: ChatView,
       meta: { keepAlive: true, requiresAuth: true },

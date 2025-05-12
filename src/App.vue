@@ -25,6 +25,9 @@
           <el-menu-item index="/">
             <span>首页</span>
           </el-menu-item>
+          <el-menu-item index="/chat">
+            <span>智能助手</span>
+          </el-menu-item>
           <el-menu-item index="/dashboards">
             <span>环境数据</span>
           </el-menu-item>
