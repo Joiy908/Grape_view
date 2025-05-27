@@ -26,6 +26,7 @@ const historyPanels = ref(
 
 <template>
   <div style="margin-top: 15px">
+    <h2 style="margin-bottom: 18px; font-size: 24px; color: #333">环境数据</h2>
     <!-- 实时面板 -->
     <el-row :gutter="20" style="margin-bottom: 20px">
       <el-col :span="4" v-for="(panel, index) in realtimePanels" :key="'rt-' + index">
