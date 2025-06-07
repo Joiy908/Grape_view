@@ -114,7 +114,12 @@ function scrollToBottom() {
     </el-scrollbar>
 
     <form ref="inputAreaRef" @submit.prevent="sendMessage" class="input-area">
-      <input v-model="inputText" type="text" placeholder="Type a message..." autocomplete="off" />
+      <input
+        v-model="inputText"
+        type="text"
+        placeholder="询问任何有关葡萄的问题..."
+        autocomplete="off"
+      />
       <button type="submit">Send</button>
     </form>
   </div>
